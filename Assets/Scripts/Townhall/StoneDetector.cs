@@ -1,15 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StoneDetector : MonoBehaviour
 {
-    public event Action<Stone> OnDetect;
+    [SerializeField] private Vector3 _center;
+    [SerializeField] private Vector3 _halfExtents;
 
-    private void OnTriggerEnter(Collider collider)
+    private Collider[] _scannedObjects;
+    private List<Stone> _stones;
+
+    private void OnEnable()
     {
-        if(collider.TryGetComponent<Stone>(out Stone stone))
+        ScanForStones();
+    }
+
+    public List<Stone> ScanForStones()
+    {
+        _stones = new List<Stone>();
+
+        _scannedObjects = Physics.OverlapBox(_center, _halfExtents, Quaternion.identity);
+
+        foreach (Collider collider in _scannedObjects)
         {
-            OnDetect?.Invoke(stone);
+            if(collider.TryGetComponent(out Stone stone))
+            {
+                _stones.Add(stone);
+            }
         }
+
+        return _stones;
     }
 }

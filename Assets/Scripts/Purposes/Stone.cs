@@ -5,29 +5,12 @@ public class Stone : Purpose
 {
     [SerializeField] private float _resourceCount;
 
-    public event Action OnDead; 
+    public event Action<Stone> OnDead; 
 
-    public float ResourceCount {
-        get { return _resourceCount; }
-        private set {
-            _resourceCount = value;
-
-            if (_resourceCount <= 0)
-            {
-                Dead();
-            }
-        }
-    }
-
-    private void Dead()
+    public float GiveResources()
     {
-        Destroy(gameObject);
+        OnDead?.Invoke(this);
 
-        OnDead?.Invoke();
-    }
-
-    public void ChangeResourceCount(float resourcesTaken)
-    {
-        _resourceCount -= resourcesTaken;
+        return _resourceCount;
     }
 }

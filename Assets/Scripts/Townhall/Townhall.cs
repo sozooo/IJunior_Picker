@@ -1,66 +1,60 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[RequireComponent(typeof(PickerPool))]
 [RequireComponent(typeof(StoneDetector))]
 public class Townhall : Purpose
-   
 {
     [SerializeField] private float _maxPickerCount;
+    [SerializeField] private Picker _pickerPrefab;
+    [SerializeField] private StoneSpawner _spawner;
+    [SerializeField] private Vector3 _halfExtentsForCollect;
 
     private float _resourceCount = 0;
-    private float _currentPickerCount = 0;
-    private PickerPool _pool;
     private StoneDetector _detector;
 
     private Queue<Stone> _stoneQueue;
+    private Queue<Picker> _pickers;
+    private List<Stone> _proceedStones;
+    private Collider[] _scannedObjects;
 
-    public event Action QueueChanged;
     public event Action<float> OnResourseCountChange;
+
+    public float ResourceCount { 
+        get { return _resourceCount; } 
+        private set 
+        {
+            _resourceCount = value;
+
+            OnResourseCountChange?.Invoke(_resourceCount);
+        }
+    }
 
     private void Awake()
     {
-        _pool = GetComponent<PickerPool>();
         _detector = GetComponent<StoneDetector>();
 
         _stoneQueue = new Queue<Stone>();
+        _pickers = new Queue<Picker>();
+        _proceedStones = new List<Stone>();
+    }
+
+    private void Start()
+    {
+        for(int i = 0; i < _maxPickerCount; i++)
+        {
+            _pickers.Enqueue(Instantiate(_pickerPrefab, transform));
+        }
     }
 
     private void OnEnable()
     {
-        _detector.OnDetect += AddStone;
-        QueueChanged += SpawnPicker;
+        _spawner.OnSpawn += AddStones;
     }
 
     private void OnDisable()
     {
-        _detector.OnDetect -= AddStone;
-        QueueChanged -= SpawnPicker;
-    }
-
-    private void DespawnPicker(Picker picker)
-    {
-        picker.OnWorksDone -= DespawnPicker;
-
-        picker.gameObject.SetActive(false);
-
-        _pool.Add(picker);
-    }
-
-    private void SpawnPicker()
-    {
-        if(_stoneQueue.Count != 0 && _currentPickerCount < _maxPickerCount)
-        {
-            Picker picker = _pool.Take();
-
-            picker.gameObject.SetActive(true);
-            picker.StartWork(_stoneQueue.Dequeue());
-            QueueChanged?.Invoke();
-
-            picker.OnWorksDone += DespawnPicker;
-        }
+        _spawner.OnSpawn -= AddStones;
     }
 
     public void AddResource(float amount)
@@ -70,10 +64,65 @@ public class Townhall : Purpose
         OnResourseCountChange?.Invoke(_resourceCount);
     }
 
-    public void AddStone(Stone stone)
+    public void AddStones()
     {
-        _stoneQueue.Enqueue(stone);
+        foreach (Stone stone in _detector.ScanForStones())
+        {
+            if (_stoneQueue.Contains(stone) == false && _proceedStones.Contains(stone) == false)
+            {
+                _stoneQueue.Enqueue(stone);
 
-        QueueChanged?.Invoke();
+                SpawnPicker();
+            }
+        }
+    }
+
+    public void CollectResource()
+    {
+        _scannedObjects = Physics.OverlapBox(transform.position, _halfExtentsForCollect);
+
+
+        foreach (Collider collider in _scannedObjects)
+        {
+            if (collider.TryGetComponent(out Stone stone))
+            {
+                stone.transform.parent = null;
+                ResourceCount += stone.GiveResources();
+            }
+        }
+    }
+
+    private void DespawnPicker(Picker picker)
+    {
+        picker.OnWorksDone -= DespawnPicker;
+        CollectResource();
+        AddStones();
+      
+        _proceedStones.Remove(picker.CurrentStone);
+        picker.gameObject.SetActive(false);
+
+        _pickers.Enqueue(picker);
+
+        if(_stoneQueue.Count != 0)
+        {
+            SpawnPicker();
+        }
+    }
+
+    private void SpawnPicker()
+    {
+        if (_stoneQueue.Count != 0 && _pickers.Count != 0)
+        {
+            Stone stone = _stoneQueue.Dequeue();
+            _proceedStones.Add(stone);
+
+            Picker picker = _pickers.Dequeue();
+
+            picker.gameObject.SetActive(true);
+            picker.StartWork(stone);
+            SpawnPicker();
+
+            picker.OnWorksDone += DespawnPicker;
+        }
     }
 }

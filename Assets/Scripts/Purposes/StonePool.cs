@@ -16,7 +16,7 @@ public class StonePool : MonoBehaviour
     {
         if (_stones.Count == 0)
         {
-            Add(Instantiate(_stonePrefab, transform));
+            Add(Instantiate(_stonePrefab));
         }
 
         return _stones.Dequeue();

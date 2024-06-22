@@ -2,21 +2,21 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(PickerMover))]
-[RequireComponent(typeof(PickerAnimator))]
+[RequireComponent(typeof(PickerMover), typeof(PickerAnimator))]
 public class Picker : MonoBehaviour
 {
-    [SerializeField] private float _maxStoneCount = 10;
+    [SerializeField] private Vector3 _backpackPosition;
 
     private Townhall _townhall;
     private PickerMover _mover;
     private PickerAnimator _animator;
     private Stone _currentStone;
-    private float _currentStoneCount;
 
     private Coroutine _workCoroutine;
 
     public event Action<Picker> OnWorksDone;
+
+    public Stone CurrentStone => _currentStone;
 
     private void Awake()
     {
@@ -55,33 +55,19 @@ public class Picker : MonoBehaviour
 
     private void TakeStone()
     {
-        _currentStone.ChangeResourceCount(_maxStoneCount);
-
-        _currentStoneCount = _maxStoneCount;
-    }
-
-    private void GiveStone()
-    {
-        _townhall.AddResource(_currentStoneCount);
-
-        _currentStoneCount = 0;
+        _currentStone.transform.parent = transform;
+        _currentStone.transform.localPosition = _backpackPosition;
     }
 
     private IEnumerator Work()
     {
-        while (_currentStone.ResourceCount > 0)
-        {
-            _animator.Walk();
+        _animator.Walk();
 
-            yield return _mover.Move(_currentStone);
-            yield return _animator.Gather();
+        yield return _mover.Move(_currentStone);
 
-            TakeStone();
+        TakeStone();
 
-            yield return _mover.Move(_townhall);
-
-            GiveStone();
-        }
+        yield return _mover.Move(_townhall);
 
         EndWork();
     }
