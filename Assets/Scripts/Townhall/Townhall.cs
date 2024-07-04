@@ -1,22 +1,26 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(StoneDetector))]
+[RequireComponent(typeof(FlagPlacer))]
 public class Townhall : Purpose
 {
-    [SerializeField] private float _maxPickerCount;
+    [SerializeField] private float _startPickerCount;
+    [SerializeField] private float _pickerCost;
+    [SerializeField] private float _buildCost;
     [SerializeField] private Picker _pickerPrefab;
-    [SerializeField] private StoneSpawner _spawner;
-    [SerializeField] private Vector3 _halfExtentsForCollect;
+    [SerializeField] private float _collectRadius;
+    [SerializeField] private StoneDetector _detector;
 
     private float _resourceCount = 0;
-    private StoneDetector _detector;
+    private FlagPlacer _flagPlacer;
 
-    private Queue<Stone> _stoneQueue;
+    private Queue<TownhallFlag> _flagQueue;
     private Queue<Picker> _pickers;
-    private List<Stone> _proceedStones;
     private Collider[] _scannedObjects;
+
+    private Coroutine _buildTownhall;
 
     public event Action<float> OnResourseCountChange;
 
@@ -32,29 +36,29 @@ public class Townhall : Purpose
 
     private void Awake()
     {
-        _detector = GetComponent<StoneDetector>();
-
-        _stoneQueue = new Queue<Stone>();
+        _flagPlacer = GetComponent<FlagPlacer>();
+        _flagQueue = new Queue<TownhallFlag>();
         _pickers = new Queue<Picker>();
-        _proceedStones = new List<Stone>();
     }
 
     private void Start()
     {
-        for(int i = 0; i < _maxPickerCount; i++)
+        for(int i = 0; i < _startPickerCount; i++)
         {
-            _pickers.Enqueue(Instantiate(_pickerPrefab, transform));
+            AddPicker();
         }
     }
 
     private void OnEnable()
     {
-        _spawner.OnSpawn += AddStones;
+        _detector.OnDetect += SpawnPicker;
+        _flagPlacer.OnPLace += AddFlag;
     }
 
     private void OnDisable()
     {
-        _spawner.OnSpawn -= AddStones;
+        _detector.OnDetect -= SpawnPicker;
+        _flagPlacer.OnPLace -= AddFlag;
     }
 
     public void AddResource(float amount)
@@ -64,46 +68,67 @@ public class Townhall : Purpose
         OnResourseCountChange?.Invoke(_resourceCount);
     }
 
-    public void AddStones()
-    {
-        foreach (Stone stone in _detector.ScanForStones())
-        {
-            if (_stoneQueue.Contains(stone) == false && _proceedStones.Contains(stone) == false)
-            {
-                _stoneQueue.Enqueue(stone);
-
-                SpawnPicker();
-            }
-        }
-    }
-
     public void CollectResource()
     {
-        _scannedObjects = Physics.OverlapBox(transform.position, _halfExtentsForCollect);
-
+        _scannedObjects = Physics.OverlapSphere(transform.position, _collectRadius);
 
         foreach (Collider collider in _scannedObjects)
         {
             if (collider.TryGetComponent(out Stone stone))
             {
+
                 stone.transform.parent = null;
                 ResourceCount += stone.GiveResources();
             }
         }
     }
 
+    public void BuyPicker()
+    {
+        if(ResourceCount >= _pickerCost)
+        {
+            AddPicker();
+
+            ResourceCount -= _pickerCost;
+        }
+    }
+
+    private void AddFlag(TownhallFlag flag)
+    {
+        _flagQueue.Enqueue(flag);
+    }
+
+    private void StartBuild(TownhallFlag flag)
+    {
+        if(_buildTownhall == null)
+        {
+            _buildTownhall = StartCoroutine(BuildTownhall(flag));
+        }
+    }
+
+    private void AddPicker()
+    {
+        _pickers.Enqueue(Instantiate(_pickerPrefab, transform));
+    }
+
     private void DespawnPicker(Picker picker)
     {
         picker.OnWorksDone -= DespawnPicker;
         CollectResource();
-        AddStones();
-      
-        _proceedStones.Remove(picker.CurrentStone);
+        _detector.AddStones();
+
+        _detector.RemoveProceedStone(picker.CurrentStone);
         picker.gameObject.SetActive(false);
 
         _pickers.Enqueue(picker);
 
-        if(_stoneQueue.Count != 0)
+        if(_flagQueue.Count != 0)
+        {
+            StartBuild(_flagQueue.Dequeue());
+            return;
+        }
+
+        if(_detector.StoneQueue.Count != 0)
         {
             SpawnPicker();
         }
@@ -111,10 +136,10 @@ public class Townhall : Purpose
 
     private void SpawnPicker()
     {
-        if (_stoneQueue.Count != 0 && _pickers.Count != 0)
+        if (_detector.StoneQueue.Count != 0 && _pickers.Count != 0)
         {
-            Stone stone = _stoneQueue.Dequeue();
-            _proceedStones.Add(stone);
+            Stone stone = _detector.GetStone();
+            _detector.AddProceedStone(stone);
 
             Picker picker = _pickers.Dequeue();
 
@@ -124,5 +149,17 @@ public class Townhall : Purpose
 
             picker.OnWorksDone += DespawnPicker;
         }
+    }
+
+    private IEnumerator BuildTownhall(TownhallFlag flag)
+    {
+        yield return new WaitUntil(() => _pickers.Count > 0 && ResourceCount >= _buildCost);
+
+        Picker picker = _pickers.Dequeue();
+
+        picker.gameObject.SetActive(true);
+        picker.BuildTownhall(flag);
+
+        picker.OnWorksDone += DespawnPicker;
     }
 }

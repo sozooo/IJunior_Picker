@@ -44,13 +44,13 @@ public class StoneSpawner : MonoBehaviour
         _stone.OnDead += DespawnStone;
 
         _currentStonesCount++;
+        OnSpawn?.Invoke();
 
         if (_timer == null)
         {
             _timer = StartCoroutine(Timer());
         }
 
-        OnSpawn?.Invoke();
     }
 
     private void DespawnStone(Stone stone)

@@ -42,6 +42,14 @@ public class Picker : MonoBehaviour
         }
     }
 
+    public void BuildTownhall(TownhallFlag flag)
+    {
+        if (_workCoroutine == null)
+        {
+            _workCoroutine = StartCoroutine(Build(flag));
+        }
+    }
+
     private void EndWork()
     {
         if (_workCoroutine != null)
@@ -49,6 +57,7 @@ public class Picker : MonoBehaviour
             StopCoroutine(_workCoroutine);
 
             _workCoroutine = null;
+            Debug.Log($"{this.name} Work done");
             OnWorksDone?.Invoke(this);
         }
     }
@@ -68,6 +77,17 @@ public class Picker : MonoBehaviour
         TakeStone();
 
         yield return _mover.Move(_townhall);
+
+        EndWork();
+    }
+
+    private IEnumerator Build(TownhallFlag flag)
+    {
+        _animator.Walk();
+
+        yield return _mover.Move(flag);
+
+        _townhall = flag.CreateTownhall();
 
         EndWork();
     }
