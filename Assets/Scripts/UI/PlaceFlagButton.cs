@@ -10,11 +10,14 @@ public class PlaceFlagButton : MonoBehaviour
     private void Awake()
     {
         _button = GetComponent<Button>();
-        _button.onClick.AddListener(Place);
+        _button.onClick.AddListener(Move);
     }
 
-    private void Place()
+    private void Move()
     {
-        _flagPlacer.StartPlacing();
+        if (_flagPlacer.Flag == null)
+            _flagPlacer.StartPlacing();
+        else
+            _flagPlacer.StartDragging();
     }
 }

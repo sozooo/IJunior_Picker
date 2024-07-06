@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,16 +10,14 @@ public class Townhall : Purpose
     [SerializeField] private float _buildCost;
     [SerializeField] private Picker _pickerPrefab;
     [SerializeField] private float _collectRadius;
-    [SerializeField] private StoneDetector _detector;
 
     private float _resourceCount = 0;
     private FlagPlacer _flagPlacer;
+    private StoneDetector _detector;
 
     private Queue<TownhallFlag> _flagQueue;
     private Queue<Picker> _pickers;
     private Collider[] _scannedObjects;
-
-    private Coroutine _buildTownhall;
 
     public event Action<float> OnResourseCountChange;
 
@@ -36,23 +33,25 @@ public class Townhall : Purpose
 
     private void Awake()
     {
+        _detector = FindAnyObjectByType<StoneDetector>();
+
         _flagPlacer = GetComponent<FlagPlacer>();
         _flagQueue = new Queue<TownhallFlag>();
         _pickers = new Queue<Picker>();
-    }
-
-    private void Start()
-    {
-        for(int i = 0; i < _startPickerCount; i++)
-        {
-            AddPicker();
-        }
     }
 
     private void OnEnable()
     {
         _detector.OnDetect += SpawnPicker;
         _flagPlacer.OnPLace += AddFlag;
+    }
+
+    private void Start()
+    {
+        for (int i = 0; i < _startPickerCount; i++)
+        {
+            AddPicker();
+        }
     }
 
     private void OnDisable()
@@ -93,25 +92,7 @@ public class Townhall : Purpose
         }
     }
 
-    private void AddFlag(TownhallFlag flag)
-    {
-        _flagQueue.Enqueue(flag);
-    }
-
-    private void StartBuild(TownhallFlag flag)
-    {
-        if(_buildTownhall == null)
-        {
-            _buildTownhall = StartCoroutine(BuildTownhall(flag));
-        }
-    }
-
-    private void AddPicker()
-    {
-        _pickers.Enqueue(Instantiate(_pickerPrefab, transform));
-    }
-
-    private void DespawnPicker(Picker picker)
+    public void DespawnPicker(Picker picker)
     {
         picker.OnWorksDone -= DespawnPicker;
         CollectResource();
@@ -122,9 +103,9 @@ public class Townhall : Purpose
 
         _pickers.Enqueue(picker);
 
-        if(_flagQueue.Count != 0)
+        if(_flagQueue.Count != 0 && ResourceCount >= _buildCost)
         {
-            StartBuild(_flagQueue.Dequeue());
+            BuildTownhall(_flagQueue.Dequeue());
             return;
         }
 
@@ -133,6 +114,28 @@ public class Townhall : Purpose
             SpawnPicker();
         }
     }
+
+    private void AddFlag(TownhallFlag flag)
+    {
+        _flagQueue.Enqueue(flag);
+    }
+
+    private void BuildTownhall(TownhallFlag flag)
+    {
+        ResourceCount -= _buildCost;
+        Picker picker = _pickers.Dequeue();
+
+        picker.gameObject.SetActive(true);
+        picker.BuildTownhall(flag);
+
+        picker.OnWorksDone += DespawnPicker;
+    }
+
+    private void AddPicker()
+    {
+        _pickers.Enqueue(Instantiate(_pickerPrefab, transform));
+    }
+
 
     private void SpawnPicker()
     {
@@ -149,17 +152,5 @@ public class Townhall : Purpose
 
             picker.OnWorksDone += DespawnPicker;
         }
-    }
-
-    private IEnumerator BuildTownhall(TownhallFlag flag)
-    {
-        yield return new WaitUntil(() => _pickers.Count > 0 && ResourceCount >= _buildCost);
-
-        Picker picker = _pickers.Dequeue();
-
-        picker.gameObject.SetActive(true);
-        picker.BuildTownhall(flag);
-
-        picker.OnWorksDone += DespawnPicker;
     }
 }

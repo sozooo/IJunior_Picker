@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,41 +10,88 @@ public class FlagPlacer : MonoBehaviour
 
     private Camera _camera;
     private TownhallFlag _flag;
-    private Coroutine _coroutine;
+    private Coroutine _moveFlag;
+
+    private Ray _ray;
+    private RaycastHit _hit;
+
+    public TownhallFlag Flag => _flag;
 
     public event Action<TownhallFlag> OnPLace;
 
     private void Awake()
     {
         _camera = Camera.main;
-        _flag = new TownhallFlag();
+        _hit = new RaycastHit();
     }
 
     public void StartPlacing()
     {
-        if(_coroutine == null)
+        if(_moveFlag == null && _flag == null)
         {
-            _coroutine = StartCoroutine(PlaceFlag());
+            _moveFlag = StartCoroutine(PlaceFlag());
+        }
+    }
+
+    public void StartDragging()
+    {
+        if (_moveFlag == null && _flag != null)
+        {
+            _moveFlag = StartCoroutine(DragFlag());
         }
     }
 
     private void Place()
     {
-        Ray ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        RaycastHit hit;
+        StopCoroutine(_moveFlag);
+        _moveFlag = null;
 
-        if (Physics.Raycast(ray, out hit))
-        {
-            _flag = Instantiate(_flagPrefab, hit.point, Quaternion.identity);
-        }
+        _flag = Instantiate(_flagPrefab, _hit.point, Quaternion.identity);
+        _flag.OnBuilded += Reset;
 
-        OnPLace?.Invoke(_flag);
+        OnPLace?.Invoke(_flag); 
+    }
+
+    private void Drag()
+    {
+        StopCoroutine(_moveFlag);
+        _moveFlag = null;
+
+        _flag.transform.position = _hit.point;
+    }
+
+    private void Reset()
+    {
+        _flag = null;
     }
 
     private IEnumerator PlaceFlag()
     {
-        yield return new WaitUntil(() => Mouse.current.leftButton.wasPressedThisFrame);
+        yield return WaitForCorrectClick();
 
         Place();
+    }
+
+    private IEnumerator DragFlag()
+    {
+        yield return WaitForCorrectClick();
+
+        Drag();
+    }
+
+    private IEnumerator WaitForCorrectClick()
+    {
+        WaitUntil wait = new(() => Mouse.current.leftButton.wasPressedThisFrame);
+
+        yield return wait;
+
+        _ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+        while (Physics.Raycast(_ray, out _hit) == false)
+        {
+            yield return wait;
+
+            _ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        }
     }
 }

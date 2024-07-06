@@ -586,6 +586,8 @@ GameObject:
   - component: {fileID: 423708981225077194}
   - component: {fileID: 3253380376351433091}
   - component: {fileID: 663839857897987297}
+  - component: {fileID: 7986127244594426978}
+  - component: {fileID: 2285356926668038015}
   m_Layer: 0
   m_Name: Townhall
   m_TagString: Untagged
@@ -676,10 +678,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startPickerCount: 3
   _pickerCost: 3
-  _buildCost: 0
+  _buildCost: 5
   _pickerPrefab: {fileID: 6591984656407888504, guid: f53fc1bd1e0ab7b4ba9a0d98d0d2dc05, type: 3}
   _collectRadius: 7
-  _detector: {fileID: 4922336156721916026, guid: 8d138edd39087934ab0f2b13844e2c75, type: 3}
 --- !u!114 &663839857897987297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,6 +694,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _flagPrefab: {fileID: 3137375858994484688, guid: 8938c50717a767f44aae304e9aa100e8, type: 3}
+--- !u!114 &7986127244594426978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4951664199525425506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dea76bbabff34eda99a30ad753f535c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvas: {fileID: 8473681290303064543}
+--- !u!65 &2285356926668038015
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4951664199525425506}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.472732, y: 13.33377, z: 10.04717}
+  m_Center: {x: 0.18546915, y: 6.666885, z: 0.3521471}
 --- !u!1 &6425150617299381679
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +958,8 @@ GameObject:
   - component: {fileID: 8576900547253370921}
   - component: {fileID: 7736367015421937304}
   - component: {fileID: 5183687129178709781}
+  - component: {fileID: 8473681290303064543}
+  - component: {fileID: 8197576181964285531}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -1015,3 +1052,27 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8473681290303064543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8482199966956759203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d12355dbf8e42e2b71baf710c7a200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8197576181964285531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8482199966956759203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d12355dbf8e42e2b71baf710c7a200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

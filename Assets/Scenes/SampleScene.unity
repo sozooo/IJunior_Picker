@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657886, g: 0.49641275, b: 0.5748176, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -326,17 +326,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357109607}
   m_CullTransparentMesh: 1
---- !u!114 &512780755 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4922336156721916026, guid: 8d138edd39087934ab0f2b13844e2c75, type: 3}
-  m_PrefabInstance: {fileID: 2050387273}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 324583da086dca44d857b30d85dbb328, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &608119246 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 564668365917868624, guid: bc2a2d2cea686b94b9a5d935732119c6, type: 3}
@@ -479,6 +468,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -560,6 +550,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49b4cc203aa6414fae5c798d1d0e7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 0
 --- !u!1 &968019868
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,10 +1048,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3253380376351433091, guid: 917a2ff17cfd52741a3ca3e158f8d338, type: 3}
-      propertyPath: _detector
-      value: 
-      objectReference: {fileID: 512780755}
     - target: {fileID: 4951664199525425506, guid: 917a2ff17cfd52741a3ca3e158f8d338, type: 3}
       propertyPath: m_Name
       value: Townhall

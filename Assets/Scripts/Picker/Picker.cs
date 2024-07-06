@@ -57,7 +57,6 @@ public class Picker : MonoBehaviour
             StopCoroutine(_workCoroutine);
 
             _workCoroutine = null;
-            Debug.Log($"{this.name} Work done");
             OnWorksDone?.Invoke(this);
         }
     }
@@ -87,7 +86,10 @@ public class Picker : MonoBehaviour
 
         yield return _mover.Move(flag);
 
+        OnWorksDone -= _townhall.DespawnPicker;
+
         _townhall = flag.CreateTownhall();
+        OnWorksDone += _townhall.DespawnPicker;
 
         EndWork();
     }
