@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e33941d3c0d9ef348b77949e9111434c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _flagPlacer: {fileID: 663839857897987297}
+  _flagPlacer: {fileID: 0}
 --- !u!1 &887985387350354859
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,9 +585,9 @@ GameObject:
   - component: {fileID: 9061192233408656394}
   - component: {fileID: 423708981225077194}
   - component: {fileID: 3253380376351433091}
-  - component: {fileID: 663839857897987297}
   - component: {fileID: 7986127244594426978}
   - component: {fileID: 2285356926668038015}
+  - component: {fileID: 663839857897987297}
   m_Layer: 0
   m_Name: Townhall
   m_TagString: Untagged
@@ -612,7 +612,7 @@ Transform:
   - {fileID: 4993043690348713369}
   - {fileID: 2214461835597168938}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &9061192233408656394
 MeshFilter:
@@ -681,19 +681,6 @@ MonoBehaviour:
   _buildCost: 5
   _pickerPrefab: {fileID: 6591984656407888504, guid: f53fc1bd1e0ab7b4ba9a0d98d0d2dc05, type: 3}
   _collectRadius: 7
---- !u!114 &663839857897987297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4951664199525425506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcc70c19d5e831d43a12e78b353eb356, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _flagPrefab: {fileID: 3137375858994484688, guid: 8938c50717a767f44aae304e9aa100e8, type: 3}
 --- !u!114 &7986127244594426978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,6 +715,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 13.472732, y: 13.33377, z: 10.04717}
   m_Center: {x: 0.18546915, y: 6.666885, z: 0.3521471}
+--- !u!114 &663839857897987297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4951664199525425506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d43d1730c1ea439880c7238476f1a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flagPrefab: {fileID: 3137375858994484688, guid: 8938c50717a767f44aae304e9aa100e8, type: 3}
 --- !u!1 &6425150617299381679
 GameObject:
   m_ObjectHideFlags: 0
