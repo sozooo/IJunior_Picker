@@ -83,15 +83,11 @@ public class FlagPlacer : MonoBehaviour
     {
         WaitUntil wait = new(() => Mouse.current.leftButton.wasPressedThisFrame);
 
-        yield return wait;
-
-        _ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-        while (Physics.Raycast(_ray, out _hit) == false)
+        do
         {
             yield return wait;
 
             _ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        }
+        } while (Physics.Raycast(_ray, out _hit) == false);
     }
 }
